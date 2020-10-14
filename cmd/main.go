@@ -1,5 +1,3 @@
-//+build demo
-
 package main
 
 import (
@@ -69,7 +67,7 @@ func (*DefaultScene) Preload() {
 	engo.Files.Load(model)
 
 	// Load TileMap
-	if err := engo.Files.Load("../assets/example.tmx"); err != nil {
+	if err := engo.Files.Load("example.tmx"); err != nil {
 		panic(err)
 	}
 
@@ -147,7 +145,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 	w.AddSystem(&PauseSystem{})
 
 	// Setup TileMap
-	resource, err := engo.Files.Resource("../assets/example.tmx")
+	resource, err := engo.Files.Resource("example.tmx")
 	if err != nil {
 		panic(err)
 	}
@@ -668,9 +666,10 @@ func (p *PauseSystem) Update(dt float32) {
 
 func main() {
 	opts := engo.RunOptions{
-		Title:  "My Little Adventure",
-		Width:  500,
-		Height: 500,
+		Title:      "My Little Adventure",
+		AssetsRoot: "../assets",
+		Width:      500,
+		Height:     500,
 	}
 	engo.Run(opts, &DefaultScene{})
 }
