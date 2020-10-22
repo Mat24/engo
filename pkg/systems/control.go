@@ -4,15 +4,16 @@ import (
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
-	"github.com/Mat24/engo/pkg/game"
+	"github.com/Mat24/engo/pkg/components"
+	"github.com/Mat24/engo/pkg/messages"
 )
 
 type ControlSystem struct {
-	entities []ControlEntity
+	entities []components.ControlEntity
 }
 
-func (c *ControlSystem) Add(basic *ecs.BasicEntity, anim *common.AnimationComponent, control *game.ControlComponent, space *common.SpaceComponent) {
-	c.entities = append(c.entities, ControlEntity{basic, anim, control, space})
+func (c *ControlSystem) Add(basic *ecs.BasicEntity, anim *common.AnimationComponent, control *components.ControlComponent, space *common.SpaceComponent) {
+	c.entities = append(c.entities, components.ControlEntity{basic, anim, control, space})
 }
 
 func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
@@ -30,13 +31,13 @@ func (c *ControlSystem) Remove(basic ecs.BasicEntity) {
 
 func (c *ControlSystem) Update(dt float32) {
 	for _, e := range c.entities {
-		setAnimation(e)
+		components.SetAnimation(e)
 
-		if vector, changed := getSpeed(e); changed {
-			speed := dt * SPEED_SCALE
+		if vector, changed := components.GetSpeed(e); changed {
+			speed := dt * messages.SPEED_SCALE
 			vector, _ = vector.Normalize()
 			vector.MultiplyScalar(speed)
-			engo.Mailbox.Dispatch(SpeedMessage{e.BasicEntity, vector})
+			engo.Mailbox.Dispatch(messages.SpeedMessage{e.BasicEntity, vector})
 		}
 	}
 }

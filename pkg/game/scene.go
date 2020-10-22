@@ -7,7 +7,13 @@ import (
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+	"github.com/Mat24/engo/pkg/characters"
+	"github.com/Mat24/engo/pkg/components"
 	"github.com/Mat24/engo/pkg/systems"
+)
+
+var (
+	actions []*common.Animation
 )
 
 type DefaultScene struct{}
@@ -22,66 +28,66 @@ func (*DefaultScene) Preload() {
 		panic(err)
 	}
 
-	StopUpAction = &common.Animation{
+	components.StopUpAction = &common.Animation{
 		Name:   "upstop",
 		Frames: []int{37},
 	}
 
-	StopDownAction = &common.Animation{
+	components.StopDownAction = &common.Animation{
 		Name:   "downstop",
 		Frames: []int{1},
 	}
 
-	StopLeftAction = &common.Animation{
+	components.StopLeftAction = &common.Animation{
 		Name:   "leftstop",
 		Frames: []int{13},
 	}
 
-	StopRightAction = &common.Animation{
+	components.StopRightAction = &common.Animation{
 		Name:   "rightstop",
 		Frames: []int{25},
 	}
 
-	WalkUpAction = &common.Animation{
+	components.WalkUpAction = &common.Animation{
 		Name:   "up",
 		Frames: []int{36, 37, 38},
 		Loop:   true,
 	}
 
-	WalkDownAction = &common.Animation{
+	components.WalkDownAction = &common.Animation{
 		Name:   "down",
 		Frames: []int{0, 1, 2},
 		Loop:   true,
 	}
 
-	WalkLeftAction = &common.Animation{
+	components.WalkLeftAction = &common.Animation{
 		Name:   "left",
 		Frames: []int{12, 13, 14},
 		Loop:   true,
 	}
 
-	WalkRightAction = &common.Animation{
+	components.WalkRightAction = &common.Animation{
 		Name:   "right",
 		Frames: []int{24, 25, 26},
 		Loop:   true,
 	}
 
 	actions = []*common.Animation{
-		StopUpAction,
-		StopDownAction,
-		StopLeftAction,
-		StopRightAction,
-		WalkUpAction,
-		WalkDownAction,
-		WalkLeftAction,
-		WalkRightAction,
+		components.StopUpAction,
+		components.StopDownAction,
+		components.StopLeftAction,
+		components.StopRightAction,
+		components.WalkUpAction,
+		components.WalkDownAction,
+		components.WalkLeftAction,
+		components.WalkRightAction,
 	}
 
-	engo.Input.RegisterButton(upButton, engo.KeyW, engo.KeyArrowUp)
-	engo.Input.RegisterButton(leftButton, engo.KeyA, engo.KeyArrowLeft)
-	engo.Input.RegisterButton(rightButton, engo.KeyD, engo.KeyArrowRight)
-	engo.Input.RegisterButton(downButton, engo.KeyS, engo.KeyArrowDown)
-	engo.Input.RegisterButton(pauseButton, engo.KeySpace)
+	engo.Input.RegisterButton(components.UpButton, engo.KeyW, engo.KeyArrowUp)
+	engo.Input.RegisterButton(components.LeftButton, engo.KeyA, engo.KeyArrowLeft)
+	engo.Input.RegisterButton(components.RightButton, engo.KeyD, engo.KeyArrowRight)
+	engo.Input.RegisterButton(components.DownButton, engo.KeyS, engo.KeyArrowDown)
+	engo.Input.RegisterButton(components.PauseButton, engo.KeySpace)
 }
 
 func (scene *DefaultScene) Setup(u engo.Updater) {
@@ -89,9 +95,11 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	common.SetBackground(color.White)
 
+	speedSystem := &systems.SpeedSystem{}
+
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
-	w.AddSystem(&systems.SpeedSystem{})
+	w.AddSystem(speedSystem)
 	w.AddSystem(&systems.ControlSystem{})
 	w.AddSystem(&systems.PauseSystem{})
 
@@ -104,8 +112,10 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 	levelData := tmxResource.Level
 
 	// Extract Map Size
-	levelWidth = levelData.Bounds().Max.X
-	levelHeight = levelData.Bounds().Max.Y
+	levelWidth := levelData.Bounds().Max.X
+	levelHeight := levelData.Bounds().Max.Y
+
+	speedSystem.SetLevelArea(levelWidth, levelHeight)
 
 	// Create Hero
 	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
@@ -115,7 +125,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 		spriteSheet,
 	)
 
-	hero.ControlComponent = ControlComponent{
+	hero.ControlComponent = components.ControlComponent{
 		SchemeHoriz: "horizontal",
 		SchemeVert:  "vertical",
 	}
@@ -139,7 +149,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 				&hero.RenderComponent,
 			)
 
-		case *ControlSystem:
+		case *systems.ControlSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.AnimationComponent,
@@ -147,14 +157,14 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 				&hero.SpaceComponent,
 			)
 
-		case *SpeedSystem:
+		case *systems.SpeedSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.SpeedComponent,
 				&hero.SpaceComponent,
 			)
 
-		case *PauseSystem:
+		case *systems.PauseSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.AnimationComponent,
@@ -228,7 +238,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 			for _, v := range tileComponents {
 				sys.Add(&v.BasicEntity, &v.RenderComponent, &v.SpaceComponent)
 			}
-		case *PauseSystem:
+		case *systems.PauseSystem:
 			for _, v := range tileComponents {
 				sys.Add(
 					&v.BasicEntity,
@@ -273,8 +283,8 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 func (*DefaultScene) Type() string { return "DefaultScene" }
 
-func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spritesheet) *Hero {
-	hero := &Hero{BasicEntity: ecs.NewBasic()}
+func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spritesheet) *characters.Hero {
+	hero := &characters.Hero{BasicEntity: ecs.NewBasic()}
 
 	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
@@ -286,7 +296,7 @@ func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spriteshee
 		Scale:    engo.Point{1, 1},
 	}
 
-	hero.SpeedComponent = SpeedComponent{}
+	hero.SpeedComponent = components.SpeedComponent{}
 	hero.AnimationComponent = common.NewAnimationComponent(spriteSheet.Drawables(), 0.1)
 
 	hero.AnimationComponent.AddAnimations(actions)

@@ -3,7 +3,7 @@ package characters
 import (
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo/common"
-	"github.com/Mat24/engo/pkg/game"
+	"github.com/Mat24/engo/pkg/components"
 )
 
 type Hero struct {
@@ -11,6 +11,6 @@ type Hero struct {
 	common.AnimationComponent
 	common.RenderComponent
 	common.SpaceComponent
-	game.ControlComponent
-	game.SpeedComponent
+	components.ControlComponent
+	components.SpeedComponent
 }

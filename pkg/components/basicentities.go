@@ -1,4 +1,4 @@
-package systems
+package components
 
 import (
 	"github.com/EngoEngine/ecs"

@@ -4,10 +4,11 @@ import (
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
+	"github.com/Mat24/engo/pkg/components"
 )
 
 type PauseSystem struct {
-	entities []pauseEntity
+	entities []components.PauseEntity
 	world    *ecs.World
 	paused   bool
 }
@@ -16,8 +17,9 @@ func (p *PauseSystem) New(w *ecs.World) {
 	p.world = w
 }
 
-func (p *PauseSystem) Add(basic *ecs.BasicEntity, animation *common.AnimationComponent, space *common.SpaceComponent, render *common.RenderComponent, control *ControlComponent, speed *SpeedComponent) {
-	p.entities = append(p.entities, pauseEntity{basic, animation, space, render, control, speed})
+func (p *PauseSystem) Add(basic *ecs.BasicEntity, animation *common.AnimationComponent, space *common.SpaceComponent, render *common.RenderComponent,
+	control *components.ControlComponent, speed *components.SpeedComponent) {
+	p.entities = append(p.entities, components.PauseEntity{basic, animation, space, render, control, speed})
 }
 
 func (p *PauseSystem) Remove(basic ecs.BasicEntity) {
@@ -34,7 +36,7 @@ func (p *PauseSystem) Remove(basic ecs.BasicEntity) {
 }
 
 func (p *PauseSystem) Update(dt float32) {
-	if engo.Input.Button(pauseButton).JustPressed() {
+	if engo.Input.Button(components.PauseButton).JustPressed() {
 		if !p.paused {
 			for _, system := range p.world.Systems() {
 				switch sys := system.(type) {
