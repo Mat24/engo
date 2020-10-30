@@ -3,11 +3,12 @@ package systems
 import (
 	"log"
 
+	"game/pkg/components"
+	"game/pkg/messages"
+
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
-	"github.com/Mat24/engo/pkg/components"
-	"github.com/Mat24/engo/pkg/messages"
 )
 
 type SpeedSystem struct {

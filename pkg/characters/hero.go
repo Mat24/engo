@@ -1,9 +1,10 @@
 package characters
 
 import (
+	"game/pkg/components"
+
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo/common"
-	"github.com/Mat24/engo/pkg/components"
 )
 
 type Hero struct {

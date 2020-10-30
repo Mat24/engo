@@ -4,12 +4,13 @@ import (
 	"image/color"
 	"log"
 
+	"game/pkg/characters"
+	"game/pkg/components"
+	"game/pkg/systems"
+
 	"github.com/EngoEngine/ecs"
 	"github.com/EngoEngine/engo"
 	"github.com/EngoEngine/engo/common"
-	"github.com/Mat24/engo/pkg/characters"
-	"github.com/Mat24/engo/pkg/components"
-	"github.com/Mat24/engo/pkg/systems"
 )
 
 var (

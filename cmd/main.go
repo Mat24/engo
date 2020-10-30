@@ -1,8 +1,9 @@
 package main
 
 import (
+	"game/pkg/game"
+
 	"github.com/EngoEngine/engo"
-	"github.com/Mat24/engo/pkg/game"
 )
 
 /*
