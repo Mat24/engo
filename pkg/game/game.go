@@ -6,9 +6,9 @@ import (
 )
 
 var (
-	model  = "motw.png"
-	width  = 52
-	height = 73
+	model      = "motw.png"
+	heroWidth  = 52
+	heroHeight = 73
 )
 
 type Tile struct {

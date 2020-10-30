@@ -119,7 +119,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 	speedSystem.SetLevelArea(levelWidth, levelHeight)
 
 	// Create Hero
-	spriteSheet := common.NewSpritesheetFromFile(model, width, height)
+	spriteSheet := common.NewSpritesheetFromFile(model, heroWidth, heroHeight)
 
 	hero := scene.CreateHero(
 		engo.Point{engo.GameWidth() / 2, engo.GameHeight() / 2},
@@ -289,8 +289,8 @@ func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spriteshee
 
 	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
-		Width:    float32(width),
-		Height:   float32(height),
+		Width:    float32(heroWidth),
+		Height:   float32(heroHeight),
 	}
 	hero.RenderComponent = common.RenderComponent{
 		Drawable: spriteSheet.Cell(0),
