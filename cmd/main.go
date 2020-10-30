@@ -7,13 +7,13 @@ import (
 )
 
 /*
-1. Refactor, show some order!
-2. Explore collision using engo
-3. Explore background sound
-4. HID on mouse click
-5. Explore animmation
-6. Enemy?
-7. Handle live, game over?
+[1]1. Refactor, show some order!
+[0]2. Explore collision using engo
+[0]3. Explore background sound
+[0]4. HID on mouse click
+[0]5. Explore animmation
+[0]6. Enemy?
+[0]7. Handle live, game over?
 */
 
 func main() {
