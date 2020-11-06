@@ -39,6 +39,10 @@ func (c *ControlSystem) Update(dt float32) {
 			vector, _ = vector.Normalize()
 			vector.MultiplyScalar(speed)
 			engo.Mailbox.Dispatch(messages.SpeedMessage{e.BasicEntity, vector})
+			engo.Mailbox.Dispatch(messages.PositionHeroMessage{
+				e.Position,
+				10,
+			})
 		}
 	}
 }

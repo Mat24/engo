@@ -97,12 +97,16 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 	common.SetBackground(color.White)
 
 	speedSystem := &systems.SpeedSystem{}
+	controlSystem := &systems.ControlSystem{}
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(speedSystem)
-	w.AddSystem(&systems.ControlSystem{})
+	w.AddSystem(controlSystem)
 	w.AddSystem(&systems.PauseSystem{})
+
+	w.AddSystem(&common.CollisionSystem{Solids: 1})
+	w.AddSystem(&systems.ZControlSystem{})
 
 	// Setup TileMap
 	resource, err := engo.Files.Resource("example.tmx")
@@ -125,13 +129,25 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 		engo.Point{engo.GameWidth() / 2, engo.GameHeight() / 2},
 		spriteSheet,
 	)
-
 	hero.ControlComponent = components.ControlComponent{
 		SchemeHoriz: "horizontal",
 		SchemeVert:  "vertical",
 	}
 
-	hero.RenderComponent.SetZIndex(1)
+	hero.RenderComponent.SetZIndex(10)
+	hero.CollisionComponent = common.CollisionComponent{
+		Main: 1,
+	}
+
+	enemy := scene.CreateEnemy(
+		engo.Point{engo.GameWidth()/2 + 120, engo.GameHeight()/2 + 120},
+		spriteSheet,
+	)
+	enemy.CollisionComponent = common.CollisionComponent{
+		Group: 1,
+	}
+
+	enemy.RenderComponent.SetZIndex(9)
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -140,30 +156,30 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.RenderComponent,
-				&hero.SpaceComponent,
-			)
+				&hero.SpaceComponent)
+
+			sys.Add(&enemy.BasicEntity,
+				&enemy.RenderComponent,
+				&enemy.SpaceComponent)
 
 		case *common.AnimationSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.AnimationComponent,
-				&hero.RenderComponent,
-			)
+				&hero.RenderComponent)
 
 		case *systems.ControlSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.AnimationComponent,
 				&hero.ControlComponent,
-				&hero.SpaceComponent,
-			)
+				&hero.SpaceComponent)
 
 		case *systems.SpeedSystem:
 			sys.Add(
 				&hero.BasicEntity,
 				&hero.SpeedComponent,
-				&hero.SpaceComponent,
-			)
+				&hero.SpaceComponent)
 
 		case *systems.PauseSystem:
 			sys.Add(
@@ -172,9 +188,23 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 				&hero.SpaceComponent,
 				&hero.RenderComponent,
 				&hero.ControlComponent,
-				&hero.SpeedComponent,
-			)
+				&hero.SpeedComponent)
+
+		case *common.CollisionSystem:
+			sys.Add(&hero.BasicEntity,
+				&hero.CollisionComponent,
+				&hero.SpaceComponent)
+			sys.Add(&enemy.BasicEntity,
+				&enemy.CollisionComponent,
+				&enemy.SpaceComponent)
+
+		case *systems.ZControlSystem:
+			sys.Add(&components.ZControlComponent{
+				Space:    &enemy.SpaceComponent,
+				Renderer: &enemy.RenderComponent,
+			})
 		}
+
 	}
 
 	// Create render and space components for each of the tiles
@@ -289,8 +319,8 @@ func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spriteshee
 
 	hero.SpaceComponent = common.SpaceComponent{
 		Position: point,
-		Width:    float32(heroWidth),
-		Height:   float32(heroHeight),
+		Width:    float32(heroWidth) / 2,
+		Height:   float32(heroHeight / 2),
 	}
 	hero.RenderComponent = common.RenderComponent{
 		Drawable: spriteSheet.Cell(0),
@@ -304,4 +334,20 @@ func (*DefaultScene) CreateHero(point engo.Point, spriteSheet *common.Spriteshee
 	hero.AnimationComponent.SelectAnimationByName("downstop")
 
 	return hero
+}
+
+func (*DefaultScene) CreateEnemy(point engo.Point, spriteSheet *common.Spritesheet) *characters.Enemy {
+	enemy := &characters.Enemy{BasicEntity: ecs.NewBasic()}
+
+	enemy.SpaceComponent = common.SpaceComponent{
+		Position: point,
+		Width:    float32(heroWidth / 2),
+		Height:   float32(heroHeight / 2),
+	}
+	enemy.RenderComponent = common.RenderComponent{
+		Drawable: spriteSheet.Cell(10),
+		Scale:    engo.Point{1, 1},
+	}
+
+	return enemy
 }

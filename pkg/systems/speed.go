@@ -34,6 +34,20 @@ func (s *SpeedSystem) New(*ecs.World) {
 			}
 		}
 	})
+
+	engo.Mailbox.Listen(common.CollisionMessage{}.Type(), func(message engo.Message) {
+		_, isCollision := message.(common.CollisionMessage)
+		if isCollision {
+			// See if we also have that Entity, and if so, change the speed
+			// for _, e := range s.entities {
+			// 	if e.ID() == collision.Entity.BasicEntity.ID() {
+			// 		e.SpeedComponent.X *= -1
+			// 	}
+			// }
+
+			log.Printf("do u wanna a pice of me? \n")
+		}
+	})
 }
 
 func (s *SpeedSystem) Add(basic *ecs.BasicEntity, speed *components.SpeedComponent, space *common.SpaceComponent) {

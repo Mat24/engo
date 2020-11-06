@@ -9,6 +9,7 @@ import (
 
 type Hero struct {
 	ecs.BasicEntity
+	common.CollisionComponent
 	common.AnimationComponent
 	common.RenderComponent
 	common.SpaceComponent
