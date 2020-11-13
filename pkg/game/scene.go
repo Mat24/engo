@@ -29,6 +29,19 @@ func (*DefaultScene) Preload() {
 		panic(err)
 	}
 
+	err := engo.Files.Load("326488.wav")
+	if err != nil {
+		log.Println(err)
+	}
+	err = engo.Files.Load("forest.mp3")
+	if err != nil {
+		log.Println(err)
+	}
+	err = engo.Files.Load("TownTheme.mp3")
+	if err != nil {
+		log.Println(err)
+	}
+
 	components.StopUpAction = &common.Animation{
 		Name:   "upstop",
 		Frames: []int{37},
@@ -98,7 +111,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem := &systems.SpeedSystem{}
 	controlSystem := &systems.ControlSystem{}
-	audioSystem := systems.NewBackgroundAudioSystem("forest.mp3", "TownTheme.mp3")
+	audioSystem := systems.NewBackgroundAudioSystem("326488.wav", "forest.mp3", "TownTheme.mp3")
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
