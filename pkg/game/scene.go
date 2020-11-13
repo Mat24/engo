@@ -98,12 +98,14 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem := &systems.SpeedSystem{}
 	controlSystem := &systems.ControlSystem{}
+	audioSystem := systems.NewBackgroundAudioSystem("forest.mp3", "TownTheme.mp3")
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
 	w.AddSystem(speedSystem)
 	w.AddSystem(controlSystem)
 	w.AddSystem(&systems.PauseSystem{})
+	w.AddSystem(audioSystem)
 
 	w.AddSystem(&common.CollisionSystem{Solids: 1})
 	w.AddSystem(&systems.ZControlSystem{})
