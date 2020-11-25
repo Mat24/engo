@@ -33,10 +33,10 @@ func (*DefaultScene) Preload() {
 	if err != nil {
 		log.Println(err)
 	}
-	err = engo.Files.Load("forest.mp3")
-	if err != nil {
-		log.Println(err)
-	}
+	// err = engo.Files.Load("forest.mp3")
+	// if err != nil {
+	// 	log.Println(err)
+	// }
 	err = engo.Files.Load("TownTheme.mp3")
 	if err != nil {
 		log.Println(err)
@@ -111,7 +111,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem := &systems.SpeedSystem{}
 	controlSystem := &systems.ControlSystem{}
-	audioSystem := systems.NewBackgroundAudioSystem("326488.wav", "forest.mp3", "TownTheme.mp3")
+	audioSystem := systems.NewBackgroundAudioSystem("326488.wav")
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
@@ -119,6 +119,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 	w.AddSystem(controlSystem)
 	w.AddSystem(&systems.PauseSystem{})
 	w.AddSystem(audioSystem)
+	w.AddSystem(&common.AudioSystem{})
 
 	w.AddSystem(&common.CollisionSystem{Solids: 1})
 	w.AddSystem(&systems.ZControlSystem{})
@@ -218,6 +219,8 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 				Space:    &enemy.SpaceComponent,
 				Renderer: &enemy.RenderComponent,
 			})
+		case *common.AudioSystem:
+			sys.Add(&audioSystem.BasicEntity, &audioSystem.AudioComponent)
 		}
 
 	}

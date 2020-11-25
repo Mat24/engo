@@ -16,7 +16,12 @@ type BackgroundAudioSystem struct {
 }
 
 func NewBackgroundAudioSystem(audio ...string) *BackgroundAudioSystem {
-	return &BackgroundAudioSystem{playList: append(audio)}
+	return &BackgroundAudioSystem{
+		AudioComponent: common.AudioComponent{
+			Player: &common.Player{},
+		},
+		playList: append(audio),
+	}
 }
 
 func (w *BackgroundAudioSystem) Add(audio *common.AudioComponent) {
@@ -40,9 +45,12 @@ func (w *BackgroundAudioSystem) Update(dt float32) {
 		}
 		w.AudioComponent.Player = w.player
 		w.player.Play()
+		w.player.SetVolume(1.0)
 		return
 	}
-	// if w.player.IsPlaying() == false {
-	// 	w.player = nil
-	// }
+	if w.player.IsPlaying() == false {
+		//w.player = nil
+		w.player.Rewind()
+		w.player.Play()
+	}
 }
