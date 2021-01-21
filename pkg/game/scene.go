@@ -29,15 +29,6 @@ func (*DefaultScene) Preload() {
 		panic(err)
 	}
 
-	err := engo.Files.Load("326488.wav")
-	if err != nil {
-		log.Println(err)
-	}
-	// err = engo.Files.Load("forest.mp3")
-	// if err != nil {
-	// 	log.Println(err)
-	// }
-
 	loadAudioFilesFromTMX()
 
 	components.StopUpAction = &common.Animation{
