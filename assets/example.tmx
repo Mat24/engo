@@ -19,4 +19,8 @@
  <imagelayer name="clouds">
   <image source="cloud.png" width="400" height="218"/>
  </imagelayer>
+ <sounds name="background">
+  <!-- <audio source="forest.mp3"/> -->
+  <audio source="TownTheme.mp3"/>
+ </sounds>
 </map>

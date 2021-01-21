@@ -37,10 +37,8 @@ func (*DefaultScene) Preload() {
 	// if err != nil {
 	// 	log.Println(err)
 	// }
-	err = engo.Files.Load("TownTheme.mp3")
-	if err != nil {
-		log.Println(err)
-	}
+
+	loadAudioFilesFromTMX()
 
 	components.StopUpAction = &common.Animation{
 		Name:   "upstop",
@@ -111,7 +109,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem := &systems.SpeedSystem{}
 	controlSystem := &systems.ControlSystem{}
-	audioSystem := systems.NewBackgroundAudioSystem("TownTheme.mp3")
+	audioSystem := systems.NewBackgroundAudioSystem(audioFiles...)
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})

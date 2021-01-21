@@ -7,6 +7,7 @@ import (
 	"github.com/EngoEngine/engo/common"
 )
 
+//BackgroundAudioSystem represents the audio system that will play sounds in the bg
 type BackgroundAudioSystem struct {
 	ecs.BasicEntity
 	common.AudioComponent
@@ -15,6 +16,7 @@ type BackgroundAudioSystem struct {
 	playerIndex int
 }
 
+//NewBackgroundAudioSystem creates a new instance of *BackgroundAudioSystem
 func NewBackgroundAudioSystem(audio ...string) *BackgroundAudioSystem {
 	return &BackgroundAudioSystem{
 		AudioComponent: common.AudioComponent{
@@ -24,33 +26,42 @@ func NewBackgroundAudioSystem(audio ...string) *BackgroundAudioSystem {
 	}
 }
 
+//Add _
 func (w *BackgroundAudioSystem) Add(audio *common.AudioComponent) {
 
 }
 
+//Remove _
 func (w *BackgroundAudioSystem) Remove(basic ecs.BasicEntity) {
 
 }
 
+func (w *BackgroundAudioSystem) setNextPlayItem() error {
+	if w.playerIndex >= len(w.playList) {
+		w.playerIndex = 0
+	}
+	var err error
+	w.player, err = common.LoadedPlayer(w.playList[w.playerIndex])
+	w.playerIndex++
+	if err != nil {
+		return err
+	}
+	w.AudioComponent.Player = w.player
+	return nil
+}
+
+//Update _
 func (w *BackgroundAudioSystem) Update(dt float32) {
-	if w.player == nil {
-		if w.playerIndex >= len(w.playList) {
-			w.playerIndex = 0
-		}
-		var err error
-		w.player, err = common.LoadedPlayer(w.playList[w.playerIndex])
-		w.playerIndex++
-		if err != nil {
-			log.Fatalln(err)
-		}
-		w.AudioComponent.Player = w.player
-		w.player.Play()
-		w.player.SetVolume(1.0)
+	if w.player != nil && w.player.IsPlaying() {
 		return
 	}
-	if w.player.IsPlaying() == false {
-		//w.player = nil
-		w.player.Rewind()
-		w.player.Play()
+
+	if err := w.setNextPlayItem(); err != nil {
+		log.Fatal(err)
+		return
 	}
+
+	w.player.Rewind()
+	w.player.Play()
+	w.player.SetVolume(0.8)
 }
