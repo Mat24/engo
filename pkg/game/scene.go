@@ -111,7 +111,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem := &systems.SpeedSystem{}
 	controlSystem := &systems.ControlSystem{}
-	audioSystem := systems.NewBackgroundAudioSystem("326488.wav")
+	audioSystem := systems.NewBackgroundAudioSystem("TownTheme.mp3")
 
 	w.AddSystem(&common.RenderSystem{})
 	w.AddSystem(&common.AnimationSystem{})
