@@ -12,6 +12,7 @@ var (
 )
 
 type Tile struct {
+	Name string
 	ecs.BasicEntity
 	common.RenderComponent
 	common.SpaceComponent

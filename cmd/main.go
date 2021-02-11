@@ -17,6 +17,9 @@ import (
 [0]5. Explore animmation
 [1]6. Enemy?
 [0]7. Handle live, game over?
+
+[]HUD live, status,
+[]Attack animation
 */
 
 func main() {

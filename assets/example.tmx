@@ -23,4 +23,9 @@
   <!-- <audio source="forest.mp3"/> -->
   <audio source="TownTheme.mp3"/>
  </sounds>
+ <objectgroup id="5" name="trees" offsetx="1.28566" offsety="0">
+  <object id="9" x="172.278" y="349.699" width="86.139" height="266.131">
+   <ellipse/>
+  </object>
+ </objectgroup>
 </map>

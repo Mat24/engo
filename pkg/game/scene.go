@@ -92,6 +92,19 @@ func (*DefaultScene) Preload() {
 	engo.Input.RegisterButton(components.DownButton, engo.KeyS, engo.KeyArrowDown)
 	engo.Input.RegisterButton(components.PauseButton, engo.KeySpace)
 }
+func NewDecorationItem(scene *DefaultScene, obj *common.Object) *characters.DecorationItem {
+	//Download the tool to edit tmx from https://thorbjorn.itch.io/tiled?download
+	//remember that It won't open due to the audio hack :/
+	result := &characters.DecorationItem{}
+	result.BasicEntity = ecs.NewBasic()
+	result.SpaceComponent = common.SpaceComponent{
+		Position: engo.Point{X: obj.X, Y: obj.Y},
+		Width:    obj.Width,
+		Height:   obj.Height,
+	}
+	result.CollisionComponent.Group = 1
+	return result
+}
 
 func (scene *DefaultScene) Setup(u engo.Updater) {
 	w, _ := u.(*ecs.World)
@@ -127,32 +140,15 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 	speedSystem.SetLevelArea(levelWidth, levelHeight)
 
+	trees := []*characters.DecorationItem{}
+	for _, layer := range levelData.ObjectLayers {
+		for _, obj := range layer.Objects {
+			trees = append(trees, NewDecorationItem(scene, obj))
+		}
+	}
+
 	// Create Hero
-	spriteSheet := common.NewSpritesheetFromFile(model, heroWidth, heroHeight)
-
-	hero := scene.CreateHero(
-		engo.Point{engo.GameWidth() / 2, engo.GameHeight() / 2},
-		spriteSheet,
-	)
-	hero.ControlComponent = components.ControlComponent{
-		SchemeHoriz: "horizontal",
-		SchemeVert:  "vertical",
-	}
-
-	hero.RenderComponent.SetZIndex(10)
-	hero.CollisionComponent = common.CollisionComponent{
-		Main: 1,
-	}
-
-	enemy := scene.CreateEnemy(
-		engo.Point{engo.GameWidth()/2 + 120, engo.GameHeight()/2 + 120},
-		spriteSheet,
-	)
-	enemy.CollisionComponent = common.CollisionComponent{
-		Group: 1,
-	}
-
-	enemy.RenderComponent.SetZIndex(9)
+	hero, enemy := createCharacters(scene)
 
 	// Add our hero to the appropriate systems
 	for _, system := range w.Systems() {
@@ -202,7 +198,11 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 			sys.Add(&enemy.BasicEntity,
 				&enemy.CollisionComponent,
 				&enemy.SpaceComponent)
-
+			for _, t := range trees {
+				sys.Add(&enemy.BasicEntity,
+					&t.CollisionComponent,
+					&t.SpaceComponent)
+			}
 		case *systems.ZControlSystem:
 			sys.Add(&components.ZControlComponent{
 				Space:    &enemy.SpaceComponent,
@@ -234,10 +234,13 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 
 				if tileLayer.Name == "grass" {
 					tile.RenderComponent.SetZIndex(0)
+					tile.Name = "grass"
 				}
 
 				if tileLayer.Name == "trees" {
-					tile.RenderComponent.SetZIndex(2)
+					tile.RenderComponent.SetZIndex(99)
+					tile.CollisionComponent.Group = 1
+					tile.Name = "tree"
 				}
 
 				tileComponents = append(tileComponents, tile)
@@ -288,6 +291,7 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 				)
 			}
 		}
+
 	}
 
 	// Access Object Layers
@@ -317,6 +321,35 @@ func (scene *DefaultScene) Setup(u engo.Updater) {
 		SpaceComponent: &hero.SpaceComponent,
 		TrackingBounds: levelData.Bounds(),
 	})
+}
+
+func createCharacters(scene *DefaultScene) (*characters.Hero, *characters.Enemy) {
+	spriteSheet := common.NewSpritesheetFromFile(model, heroWidth, heroHeight)
+
+	hero := scene.CreateHero(
+		engo.Point{engo.GameWidth() / 2, engo.GameHeight() / 2},
+		spriteSheet,
+	)
+	hero.ControlComponent = components.ControlComponent{
+		SchemeHoriz: "horizontal",
+		SchemeVert:  "vertical",
+	}
+
+	hero.RenderComponent.SetZIndex(10)
+	hero.CollisionComponent = common.CollisionComponent{
+		Main: 1,
+	}
+
+	enemy := scene.CreateEnemy(
+		engo.Point{engo.GameWidth()/2 + 120, engo.GameHeight()/2 + 120},
+		spriteSheet,
+	)
+	enemy.CollisionComponent = common.CollisionComponent{
+		Group: 1,
+	}
+
+	enemy.RenderComponent.SetZIndex(9)
+	return hero, enemy
 }
 
 func (*DefaultScene) Type() string { return "DefaultScene" }
